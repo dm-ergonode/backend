@@ -23,6 +23,7 @@ default:
 
 
     extensions:
+        App\Tests\Behat\Extension\ParallelBuild\ParallelBuildExtension: ~
         FriendsOfBehat\SymfonyExtension: ~
         Behatch\Extension: ~
         Behat\MinkExtension:
