@@ -184,9 +184,90 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
+        "ergonode:test": [
+            "@putenv COMPOSER=phpstan-composer.json",
+            "@putenv APP_URL=http://localhost:8001",
+            "@putenv APP_ENV=test",
+            "@ergonode:check:cbf",
+            "@ergonode:check:cs",
+            "@ergonode:check:phpstatn",
+            "@auto-scripts",
+            "@ergonode:test:unit",
+            "@ergonode:test:behat"
+        ],
+        "ergonode:test:database:recreate": [
+            "@putenv APP_URL=http://localhost:8001",
+            "@putenv APP_ENV=test",
+            "@ergonode:check:cbf",
+            "@ergonode:check:cs",
+            "@ergonode:check:phpstatn",
+            "@auto-scripts",
+            "@ergonode:database:recreate",
+            "@ergonode:database:fixture",
+            "@ergonode:test:unit",
+            "@ergonode:test:behat"
+        ],
+        "ergonode:test:unit": [
+            "./bin/phpunit"
+        ],
+        "ergonode:test:behat": [
+            "@putenv APP_URL=http://localhost:8001",
+            "@putenv APP_ENV=test",
+            "@php -d error_reporting='E_ALL & ~E_DEPRECATED'  ./bin/behat --colors --stop-on-failure"
+        ],
+        "ergonode:database:recreate": [
+            "./bin/console doctrine:database:drop --if-exists --no-interaction --force",
+            "@ergonode:database:create",
+            "@ergonode:database:migrate"
+        ],
+        "ergonode:database:create": [
+            "./bin/console doctrine:database:create --no-interaction"
+        ],
+        "ergonode:database:migrate": [
+            "./bin/console ergonode:migrations:migrate --no-interaction --allow-no-migration"
+        ],
+        "ergonode:database:fixture": [
+            "./bin/console ergonode:fixture:load --no-interaction"
+        ],
+        "ergonode:database:fixture:dev": [
+            "@php -d memory_limit=-1 ./bin/console ergonode:fixture:load -g develop --no-interaction"
+        ],
+        "ergonode:check:cs": [
+            "./bin/phpcs -n"
+        ],
+        "ergonode:check:cbf": [
+            "./bin/phpcbf"
+        ],
+        "ergonode:test:server:start": [
+            "@php ./bin/console server:start --pidfile=./.web-server-8001.pid 127.0.0.1:8001"
+        ],
+        "check:phpstatn": [
+            "./bin/phpstatn analyse module --level 1"
+        ],
         "behat": [
-            "php -d error_reporting='E_ALL & ~E_DEPRECATED'  ./bin/behat --colors --stop-on-failure"
+            "@ergonode:test:behat"
+        ],
+        "test": [
+            "@ergonode:test"
         ]
+    },
+    "scripts-descriptions": {
+        "ergonode:test:unit:coverage" : "Executes unit tests.",
+        "ergonode:test:unit" : "Executes unit tests.",
+        "ergonode:test:behat" : "Executes behat tests",
+        "ergonode:test" : "Execute all tests.",
+        "ergonode:test:database:recreate" : "Execute all tests with database recreation.",
+        "ergonode:database:recreate" : "Recreate test database",
+        "ergonode:database:create" : "Create database",
+        "ergonode:database:migrate" : "Migrate database migrations",
+        "ergonode:database:fixture" : "Fill database with basic data",
+        "ergonode:database:fixture:dev" : "Fill database with development data",
+        "ergonode:check:cs": "PHPCS checker",
+        "ergonode:check:cbf": "PHPCBF fixer",
+        "ergonode:check:phpstatn": "phpstatn",
+        "ergonode:test:server:start": "Starts test http server for behat tests",
+        "behat": "Shortcut to command ergonode:test:behat",
+        "test": "Shortcut to  command ergonode:test"
     },
     "conflict": {
         "symfony/symfony": "*"
