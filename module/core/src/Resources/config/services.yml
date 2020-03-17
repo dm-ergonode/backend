@@ -10,6 +10,10 @@ services:
     Ergonode\Core\Application\:
         resource: '../../Application/*'
 
+    Ergonode\Core\Application\EventListener\HandlerFailedExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
+
     Ergonode\Core\Domain\:
         resource: '../../Domain/*'
         exclude: '../../Domain/{Entity, ValueObject}'
